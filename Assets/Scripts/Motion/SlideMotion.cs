@@ -27,7 +27,6 @@ public class SlideMotion : MonoBehaviour
         {
             Debug.LogError("Rigidbody组件未找到");
         }
-        slideHeight= .5f * this.transform.localScale.y;
     }
     public void Slide(Vector3 moveDir) //触发滑铲
     {
