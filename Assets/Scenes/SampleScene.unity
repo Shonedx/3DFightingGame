@@ -1303,6 +1303,7 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 7267929302087193079, guid: 3c04edbb8c5828440be0f97830e019ea, type: 3}
     - {fileID: 4304524157362197379, guid: 3c04edbb8c5828440be0f97830e019ea, type: 3}
+    - {fileID: 6684476211539327093, guid: 3c04edbb8c5828440be0f97830e019ea, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1388328877563189188, guid: 3c04edbb8c5828440be0f97830e019ea,
@@ -1350,12 +1351,6 @@ Rigidbody:
 --- !u!1 &407963554 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9108663412257785880, guid: 3c04edbb8c5828440be0f97830e019ea,
-    type: 3}
-  m_PrefabInstance: {fileID: 407963551}
-  m_PrefabAsset: {fileID: 0}
---- !u!198 &407963555 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 6763620208436935498, guid: 3c04edbb8c5828440be0f97830e019ea,
     type: 3}
   m_PrefabInstance: {fileID: 407963551}
   m_PrefabAsset: {fileID: 0}
@@ -2665,8 +2660,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1172f49f6aa6bee4c9028392cc53fd3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxPoolSize: 300
-  bulletPrefab: {fileID: 840374814580176193, guid: 7438e50f7bca41c4ebba8e199a5bb2f7,
+  maxPoolSize: 100
+  objectPrefab: {fileID: 8652628253623774249, guid: a2ecef8c6aabb3844867373da66aa637,
     type: 3}
 --- !u!1 &1451086469
 GameObject:
@@ -2766,16 +2761,24 @@ MonoBehaviour:
   spawnPoint: {fileID: 407963556}
   bulletsTrail: {fileID: 1678664128534402885, guid: a2ecef8c6aabb3844867373da66aa637,
     type: 3}
-  shootingSystem: {fileID: 407963555}
+  shootingSystem: {fileID: 4263846163031548748, guid: 3d573f5081cec844aac8cdf94b7d3ee2,
+    type: 3}
+  cinemachineBrain: {fileID: 330585548}
+  shootingMaxDistance: 200
   shootingSpread: 0
   shootingSpreadVariance: {x: 0.1, y: 0.1, z: 0.1}
   Mask:
     serializedVersion: 2
     m_Bits: 4294967295
   lastShootTime: 0
-  shootCooldown: 0.1
-  cinemachineBrain: {fileID: 330585548}
-  shootingMaxDistance: 200
+  shootCooldown: 0.05
+  magzineCapacity: 30
+  currentMagzineCapacity: 0
+  isMagzineNull: 0
+  isAuto: 0
+  burstCount: 3
+  currentBurstCount: 0
+  shootingGaptime: 0.2
 --- !u!4 &1636527463
 Transform:
   m_ObjectHideFlags: 0
@@ -3232,6 +3235,11 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 319411690}
+  - {fileID: 1987532919}
+  - {fileID: 645349004}
+  - {fileID: 407963551}
+  - {fileID: 1636527463}
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 923827616}
@@ -3241,12 +3249,7 @@ SceneRoots:
   - {fileID: 367316831}
   - {fileID: 1776918844}
   - {fileID: 378479178}
-  - {fileID: 645349004}
   - {fileID: 712897563}
   - {fileID: 660675362}
-  - {fileID: 407963551}
-  - {fileID: 1987532919}
   - {fileID: 1345794145}
   - {fileID: 180734195714345971}
-  - {fileID: 319411690}
-  - {fileID: 1636527463}

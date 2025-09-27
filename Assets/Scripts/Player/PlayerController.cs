@@ -82,12 +82,22 @@ public class PlayerController : MonoBehaviour
         {
             StopCrouch();
         }
-        if (gameInput.GetToShot()) //检测射击
+        if (gun.isAuto) //自动模式
         {
-            gun.Shoot();
+            if (gameInput.GetShotPressed()) //识别按键按住
+                gun.ShootHandler();
+        }
+        else
+        {
+            if(gameInput.GetShotPerformed()) //识别按键按下
+                gun.ShootHandler();
+        }
+        if (gameInput.GetToReload())
+        {
+            gun.Reload();
         }
         //检测滑铲
-        isSlide=gameInput.GetToSlide();
+        isSlide = gameInput.GetToSlide();
         //检测疾跑
         isSprint = gameInput.GetToSprint(); 
         currentSpeed = isSprint?sprintSpeed:walkSpeed;

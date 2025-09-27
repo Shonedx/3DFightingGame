@@ -25,7 +25,6 @@ public class GameInput : MonoBehaviour
     public Vector2 GetMovementNormalized() //获取归一化的移动输入
     { 
         Vector2 inputVector2=playerInputAction.Player.Move.ReadValue<Vector2>();
-        Debug.Log("input:" + inputVector2);
         return inputVector2.normalized;
     }
     public bool GetPersonViewSwitchBool() //识别人称切换按键是否按下
@@ -57,9 +56,13 @@ public class GameInput : MonoBehaviour
     {
         return playerInputAction.Player.Sprint.IsPressed();
     }
-    public bool GetToShot()
+    public bool GetShotPressed()
     {
-        return playerInputAction.Player.Attack.IsPressed(); //可以按住射击
+        return playerInputAction.Player.Attack.IsPressed(); //识别按住
+    }
+    public bool GetShotPerformed()
+    {
+        return playerInputAction.Player.Attack.WasPressedThisFrame(); //识别按下
     }
     public bool GetToReload()
     {

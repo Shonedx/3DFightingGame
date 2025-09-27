@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Bullets : MonoBehaviour
 {
-    
     private float lifeTime = 50f;
     private float delayTime = .5f;
     [SerializeField]
@@ -17,7 +16,7 @@ public class Bullets : MonoBehaviour
     {
         yield return new WaitForSeconds(time);
         this.gameObject.SetActive(false);
-        BulletPoolManager.Instance.ReturnBullet(this.gameObject); //回收子弹
+        MyObjectPool.Instance.ReturnObject(this.gameObject); //回收子弹
     }
     void OnCollisionEnter(Collision collision)
     {
