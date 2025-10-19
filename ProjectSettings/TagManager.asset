@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - Enemy
+  - UI
   layers:
   - Default
   - TransparentFX
@@ -16,8 +17,8 @@ TagManager:
   - isGround
   - isSlope
   - Bullets
-  - Player1
-  - Player2
+  - Player
+  - Obstacle
   - 
   - 
   - 

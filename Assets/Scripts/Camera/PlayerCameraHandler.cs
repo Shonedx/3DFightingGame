@@ -24,10 +24,11 @@ public class PlayerCameraHandler : MonoBehaviour
     [Header("玩家")]
     [SerializeField] private GameObject player;
     [Header("视觉中心点")]
-    [SerializeField] private GameObject visualCenterPoint;
+    [SerializeField] private GameObject visualCenterPoint; //这个地方传和本体同位置的父对象而不是子对象
     [Header("游戏输入设置")]
     [SerializeField] private GameInput gameInput;
-
+    [Header("光标锁定")]
+    [SerializeField] private bool lockCurser = true;
     #region CameraParameters
     private bool isAiming = false; //是否瞄准
     [Header("相机旋转参数")]
@@ -47,6 +48,7 @@ public class PlayerCameraHandler : MonoBehaviour
     [field: SerializeField] public CameraState currentCameraState { get; private set; } = CameraState.firstPersonCameraState;
     private void Awake()
     {
+        if(lockCurser)
         Cursor.lockState = CursorLockMode.Locked; //锁定鼠标光标
         UpdatePersonCameraState(); //初始化人称状态
     }

@@ -3,45 +3,65 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using Health_Namespace;
 public class Gun : MonoBehaviour
 {
+    // Éä»÷ÊÂ¼şÎ¯ÍĞ
+    public delegate void ShootEventHandler();
+    public event ShootEventHandler OnShoot;
 
-    [SerializeField] private ParticleSystem metalImpactSystem;
-    [SerializeField] private Transform spawnPoint;
-    [SerializeField] private TrailRenderer bulletsTrail; //å­å¼¹è½¨è¿¹
-    [SerializeField] private ParticleSystem shootingSystem;
-  
-    [SerializeField] private CinemachineBrain cinemachineBrain;
-    [Header("å°„å‡»å‚æ•°")]
-    [SerializeField] private float shootingMaxDistance;//å°„å‡»è·ç¦»
-    [SerializeField] private bool shootingSpread; //æ˜¯å¦å¼€å¯å°„å‡»åç§»
-    [SerializeField] private Vector3 shootingSpreadVariance = new Vector3(.1f, .1f, .1f); //å°„å‡»åç§»å€¼
-    [SerializeField] private LayerMask Mask; //å°„çº¿æ£€æµ‹å±‚ ç›®å‰é»˜è®¤ä¸ºeverything
-    [SerializeField] private float lastShootTime; //ä¸Šæ¬¡å°„å‡»æ—¶é—´ ç”¨äºè‡ªåŠ¨å¼€ç«
-    [SerializeField] private float shootCooldown;  //è‡ªåŠ¨å¼€ç«å†·å´æ—¶é—´ æŒ‡æ¯æ¬¡å¼€ç«é—´éš” 
-    [SerializeField] private float reloadTime = 1f;
-    [SerializeField] private int magzineCapacity=30; //å¼¹å¤¹å®¹é‡
-    [SerializeField] private int currentMagzineCapacity; //å½“å‰å¼¹å¤¹å®¹é‡
-    [SerializeField] private bool isMagzineNull=false; //å¼¹å¤¹æ˜¯å¦ä¸ºç©º
-    //è¿å‘å‚æ•°
-    [SerializeField] public bool isAuto = false; //æ ‡å¿—è‡ªåŠ¨å°„å‡»å’Œè¿å‘æ¨¡å¼
-    [SerializeField] private int burstCount = 3; //è¿å‘æ¬¡æ•°
-    [SerializeField] private int currentBurstCount = 0; //å½“å‰è¿å‘æ¬¡æ•°
-    [SerializeField] private float shootingGaptime = .2f;//è¿å‘é—´éš”æ—¶é—´
-    private bool readyToShoot = true; //æ˜¯å¦å‡†å¤‡å¥½å°„å‡»
-    
-    //å­å¼¹è½¨è¿¹è¿åŠ¨æ—¶é—´
-    private float trailTime;
+    [SerializeField] private ParticleSystem metalImpactSystem; // ½ğÊô×²»÷Á£×ÓĞ§¹û
+    [SerializeField] private Transform spawnPoint; // ×Óµ¯·¢Éäµã
+    [SerializeField] private TrailRenderer bulletsTrail; // ×Óµ¯¹ì¼£
+    [SerializeField] private ParticleSystem shootingSystem; // Éä»÷Á£×ÓĞ§¹û
+
+    [SerializeField] private CinemachineBrain cinemachineBrain; // cinemachineÏà»ú¿ØÖÆÆ÷
+
+    [Header("Éä»÷²ÎÊı")]
+    [SerializeField] private float shootingMaxDistance; // ×î´óÉä»÷¾àÀë
+    [SerializeField] private bool shootingSpread; // ÊÇ·ñÆôÓÃÉä»÷À©É¢
+    [SerializeField] private Vector3 shootingSpreadVariance = new Vector3(.1f, .1f, .1f); // Éä»÷À©É¢·¶Î§
+    [SerializeField] private LayerMask Mask; // ÉäÏß¼ì²â²ã£¨Ä¬ÈÏÎªËùÓĞ²ã£©
+    [SerializeField] private float lastShootTime; // ÉÏ´ÎÉä»÷Ê±¼ä£¨ÓÃÓÚ×Ô¶¯¿ª»ğ£©
+    [SerializeField] private float shootCooldown;  // ×Ô¶¯¿ª»ğÀäÈ´Ê±¼ä£¨Ã¿´ÎÉä»÷¼ä¸ô£©
+    [SerializeField] private float reloadTime = 1f; // »»µ¯Ê±¼ä
+    [SerializeField] private int magzineCapacity = 30; // µ¯Ï»ÈİÁ¿
+    [SerializeField] private int currentMagzineCapacity; // µ±Ç°µ¯Ï»Ê£ÓàÊıÁ¿
+    [SerializeField] private bool isMagzineNull = false; // µ¯Ï»ÊÇ·ñÎª¿Õ
+
+    // Á¬Éä²ÎÊı
+    [SerializeField] public bool isAuto; // ÊÇ·ñÎª×Ô¶¯Éä»÷Ä£Ê½
+    [SerializeField] private int burstCount; // Á¬Éä´ÎÊı
+    [SerializeField] private int currentBurstCount = 0; // µ±Ç°Á¬Éä¼ÆÊı
+    [SerializeField] private float shootingGaptime = .2f; // Á¬Éä¼ä¸ôÊ±¼ä
+    private bool readyToShoot = true; // ÊÇ·ñ×¼±¸ºÃÉä»÷
+
+    [Header("×Óµ¯¹ì¼£³ÖĞøÊ±¼ä")]
+    [SerializeField] private float trailTime; // ¹ì¼£ÏÔÊ¾Ê±¼ä
+
     private void Awake()
     {
         currentMagzineCapacity = magzineCapacity;
+        OnShoot += DecreaseCurrentMagzineCapacity;
     }
+
+    private void OnDestroy()
+    {
+        // ÒÆ³ıÊÂ¼ş¼àÌı£¬·ÀÖ¹ÄÚ´æĞ¹Â©
+        OnShoot -= DecreaseCurrentMagzineCapacity;
+    }
+
     private void Update()
     {
-        isMagzineNull = currentMagzineCapacity<0;
+        isMagzineNull = currentMagzineCapacity < 0;
     }
+
+    /// <summary>
+    /// Éä»÷´¦Àíº¯Êı
+    /// </summary>
     public void ShootHandler()
     {
+        // ¸üĞÂµ¯Ï»×´Ì¬
         if (currentMagzineCapacity > 0)
             isMagzineNull = false;
         else
@@ -49,122 +69,202 @@ public class Gun : MonoBehaviour
             currentMagzineCapacity = 0;
             isMagzineNull = true;
         }
+
+        // Èç¹ûµ¯Ï»²»Îª¿Õ
         if (!isMagzineNull)
         {
+            // ×Ô¶¯Éä»÷Ä£Ê½ÇÒÀäÈ´Íê³É
             if (isAuto && (lastShootTime + shootCooldown < Time.time))
             {
                 Shoot();
-                lastShootTime = Time.time; //æ›´æ–°æ—¶é—´
+                lastShootTime = Time.time; // ¸üĞÂÉä»÷Ê±¼ä
             }
-            else if (!isAuto && readyToShoot) //è¿å‘æ¨¡å¼ 
+            // ·Ç×Ô¶¯Ä£Ê½ÇÒ×¼±¸¾ÍĞ÷£¨Á¬ÉäÄ£Ê½£©
+            else if (!isAuto && readyToShoot)
             {
                 currentBurstCount++;
                 Shoot();
-                readyToShoot = false; //ç¦æ­¢ä¸‹ä¸€æ¬¡å°„å‡»
-                StartCoroutine(ResetShot());
+                readyToShoot = false; // ×èÖ¹ÏÂÒ»´ÎÉä»÷
+                StartCoroutine(BurstShot());
             }
         }
-        else 
+        // µ¯Ï»Îª¿ÕÊ±»»µ¯
+        else
         {
-            Invoke(nameof(Reload),reloadTime) ;
+            Invoke(nameof(Reload), reloadTime);
         }
-        currentMagzineCapacity--;
     }
-    public void Reload()//ä¸Šå­å¼¹
+
+    /// <summary>
+    /// »ñÈ¡µ¯Ï»×ÜÈİÁ¿
+    /// </summary>
+    public int GetMagzineCap()
+    {
+        return magzineCapacity;
+    }
+
+    /// <summary>
+    /// »ñÈ¡µ±Ç°µ¯Ï»Ê£ÓàÊıÁ¿
+    /// </summary>
+    public int GetCurrentMagzineCap()
+    {
+        return currentMagzineCapacity;
+    }
+
+    /// <summary>
+    /// ÖØĞÂ×°µ¯
+    /// </summary>
+    public void Reload()
     {
         currentMagzineCapacity = magzineCapacity;
-        isMagzineNull = false; //å¼¹å¤¹ä¸ä¸ºç©º
-        Debug.Log("ReloadDone");
-
+        isMagzineNull = false; // µ¯Ï»²»Îª¿Õ
     }
-    private IEnumerator ResetShot()
+
+    /// <summary>
+    /// ¼õÉÙµ±Ç°µ¯Ï»ÊıÁ¿
+    /// </summary>
+    private void DecreaseCurrentMagzineCapacity()
+    {
+        if (currentMagzineCapacity > 0)
+            currentMagzineCapacity--;
+    }
+
+    /// <summary>
+    /// Á¬ÉäĞ­³Ì
+    /// </summary>
+    private IEnumerator BurstShot()
     {
         yield return new WaitForSeconds(shootingGaptime);
+
         while (currentBurstCount != burstCount)
         {
             currentBurstCount++;
             Shoot();
             yield return new WaitForSeconds(shootingGaptime);
         }
+
         readyToShoot = true;
         currentBurstCount = 0;
-        Debug.Log("burstDone");
     }
+
+    /// <summary>
+    /// Ö´ĞĞÉä»÷²Ù×÷
+    /// </summary>
     public void Shoot()
     {
-        Instantiate(shootingSystem, spawnPoint.position, Quaternion.LookRotation(spawnPoint.forward));
-        //shootingSystem.Play();
+        // ´¥·¢Éä»÷ÊÂ¼ş
+        OnShoot?.Invoke();
+
+        // ¼ÆËãÉä»÷·½ÏòºÍÄ¿±êÎ»ÖÃ
         Vector3 targetPosition;
         Vector3 direction = GetShootDirection(out targetPosition);
+
+        // ÉäÏß¼ì²â
         if (Physics.Raycast(spawnPoint.position, direction, out RaycastHit hit, float.MaxValue, Mask))
         {
+            GameObject target= hit.collider.gameObject;
+            if(target!= null&&target.CompareTag("Enemy"))
+            PlayerDamage(10, target); // ¶ÔÃüÖĞµÄÄ¿±êÔì³ÉÉËº¦
+            // ´Ó¶ÔÏó³Ø»ñÈ¡¹ì¼£¶ÔÏó
             GameObject trailObj = MyObjectPool.Instance.GetObject();
-            TrailRenderer trail=trailObj.GetComponent<TrailRenderer>();
+            TrailRenderer trail = trailObj.GetComponent<TrailRenderer>();
             trail.transform.position = spawnPoint.position;
-            //TrailRenderer trail = Instantiate(bulletsTrail, spawnPoint.position, Quaternion.identity);
             StartCoroutine(SpawnTrail(trail, hit));
         }
         else
         {
+            // ´Ó¶ÔÏó³Ø»ñÈ¡¹ì¼£¶ÔÏó
             GameObject trailObj = MyObjectPool.Instance.GetObject();
             TrailRenderer trail = trailObj.GetComponent<TrailRenderer>();
             trail.transform.position = spawnPoint.position;
-            //TrailRenderer trail = Instantiate(bulletsTrail, spawnPoint.position, Quaternion.identity);
             StartCoroutine(SpawnTrailToMaxDistance(trail, targetPosition));
-
         }
     }
-    
+    ///<summary>
+    ///Ö´ĞĞDamage
+    /// </summary>
+    void PlayerDamage(int hurtValue, GameObject gameObject)
+    {
+        gameObject.GetComponent<Health>().TakeDamage(hurtValue);
+    }
+    /// <summary>
+    /// »ñÈ¡Éä»÷·½Ïò
+    /// </summary>
+    /// <param name="targetPosition">Êä³öÄ¿±êÎ»ÖÃ</param>
+    /// <returns>Éä»÷·½ÏòÏòÁ¿</returns>
     private Vector3 GetShootDirection(out Vector3 targetPosition)
     {
         Camera currentCamera = cinemachineBrain.OutputCamera;
+        // ´ÓÏà»úÖĞĞÄ·¢ÉäÉäÏß
         Ray ray = currentCamera.ViewportPointToRay(new Vector3(.5f, .5f, 0));
         RaycastHit hit;
+
+        // Ä¬ÈÏÄ¿±êÎ»ÖÃÎª×î´óÉä³Ì´¦
         targetPosition = ray.GetPoint(shootingMaxDistance);
+
+        // Èç¹ûÉäÏß»÷ÖĞÎïÌå£¬¸üĞÂÄ¿±êÎ»ÖÃ
         if (Physics.Raycast(ray, out hit))
         {
             targetPosition = hit.point;
         }
-        Vector3 dir =targetPosition- spawnPoint.position;
-        dir += new Vector3(Random.Range(-shootingSpreadVariance.x, shootingSpreadVariance.x),
+
+        // ¼ÆËã´Ó·¢Éäµãµ½Ä¿±êÎ»ÖÃµÄ·½Ïò
+        Vector3 dir = targetPosition - spawnPoint.position;
+
+        // Ó¦ÓÃÉä»÷À©É¢
+        dir += new Vector3(
+            Random.Range(-shootingSpreadVariance.x, shootingSpreadVariance.x),
             Random.Range(-shootingSpreadVariance.y, shootingSpreadVariance.y),
             Random.Range(-shootingSpreadVariance.z, shootingSpreadVariance.z)
-            );
+        );
+
         return dir;
     }
+    /// <summary>
+    /// Éú³Éµ½×î´ó¾àÀëµÄ×Óµ¯¹ì¼£
+    /// </summary>
     private IEnumerator SpawnTrailToMaxDistance(TrailRenderer trail, Vector3 targetPosition)
     {
         float time = 0;
         Vector3 startPosition = trail.transform.position;
+
+        // ²åÖµÒÆ¶¯¹ì¼£
         while (time < 1)
         {
             trail.transform.position = Vector3.Lerp(startPosition, targetPosition, time);
             time += Time.deltaTime / trailTime;
             yield return null;
         }
+
         trail.transform.position = targetPosition;
-        //å°„åˆ°ç›®æ ‡åå»¶æ—¶ä¸€æ®µæ—¶é—´å›æ”¶
+
+        // µÈ´ı¹ì¼£ÏûÊ§ºó»ØÊÕ¶ÔÏó
         yield return new WaitForSeconds(trail.time);
         MyObjectPool.Instance.ReturnObject(trail.gameObject);
-
-        //Destroy(trail.gameObject, trail.time);
     }
-    private IEnumerator SpawnTrail(TrailRenderer trail,RaycastHit hit)
+
+    /// <summary>
+    /// Éú³É»÷ÖĞÄ¿±êµÄ×Óµ¯¹ì¼£
+    /// </summary>
+    private IEnumerator SpawnTrail(TrailRenderer trail, RaycastHit hit)
     {
         float time = 0;
         Vector3 startPosition = trail.transform.position;
+
+        // ²åÖµÒÆ¶¯¹ì¼£
         while (time < 1)
         {
-           trail.transform.position = Vector3.Lerp(startPosition,hit.point,time);
-           time += Time.deltaTime/trailTime;
-           yield return null;
+            trail.transform.position = Vector3.Lerp(startPosition, hit.point, time);
+            time += Time.deltaTime / trailTime;
+            yield return null;
         }
-        trail.transform.position = hit.point; 
+
+        trail.transform.position = hit.point;
+        // Éú³É×²»÷Á£×ÓĞ§¹û
         Instantiate(metalImpactSystem, hit.point, Quaternion.LookRotation(hit.normal));
-        //å°„åˆ°ç›®æ ‡åå»¶æ—¶ä¸€æ®µæ—¶é—´å›æ”¶
+
+        // µÈ´ı¹ì¼£ÏûÊ§ºó»ØÊÕ¶ÔÏó
         yield return new WaitForSeconds(trail.GetComponent<TrailRenderer>().time);
         MyObjectPool.Instance.ReturnObject(trail.gameObject);
-        //Destroy(trail.gameObject, trail.time); 
     }
- 
 }
